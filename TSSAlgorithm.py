@@ -2,85 +2,70 @@ import snap
 
 
 # noinspection PyUnresolvedReferences
-def tss(graph: snap.TUNGraph, threshold):
-
+def tssAlgorithm(graph: snap.TUNGraph, threshold):
     match = False
-    s = set()
+    seedSet = set()
     removeSet = set()
 
-    while graph.GetNodes() != 0:   # Finché non è vuoto il grafo
+    #While the graph is not empty
+    while graph.GetNodes() != 0:   
         match = False
-
-        for x in graph.Nodes():     # Scorrere i vertici
+        
+        #Read all the vertex
+        for x in graph.Nodes():
+            #case1     
             if threshold[x.GetId()] == 0:
                 match = True                
-                print("Caso 1: threshold["+str(x.GetId())+"] = 0")
+                #print("Case 1: threshold["+str(x.GetId())+"] = 0")
                 for y in x.GetOutEdges():
                     if threshold[y] > 0:
-                        threshold[y] = threshold[y] - 1         # Si riduce il threshold dei vicini
+                        # reduce the threshold of the neighbor
+                        threshold[y] = threshold[y] - 1         
                     removeSet.add(y);
 
+                #remove the edges to the neighbors
                 for edge in removeSet:
-                    graph.DelEdge(x.GetId(), edge)     # Si rimuovono gli archi con i vicini.
-
-                graph.DelNode(x.GetId())            # Si rimuove il nodo.
-                removeSet.clear()
-            elif x.GetOutDeg() < threshold[x.GetId()]:
-                print("Caso 2: grado di "+str(x.GetId())+" pari a "+str(x.GetOutDeg())+" e minore di threshold[" + str(x.GetId()) + "] = " + str(threshold[x.GetId()]))
-                match = True
-                s.add(x.GetId())        # Aggiunto x al seed set
+                    graph.DelEdge(x.GetId(), edge)
                 
-                for y in x.GetOutEdges():   # Rimozione del nodo dal grafo
+                #remove the node and clear the removeSet
+                graph.DelNode(x.GetId())     
+                removeSet.clear()
+            #case2
+            elif x.GetOutDeg() < threshold[x.GetId()]:
+                #print("Case 2: the grade of the node: "+str(x.GetId())+" is: "+str(x.GetOutDeg())+", lower than the threshold[" + str(x.GetId()) + "] = " + str(threshold[x.GetId()]))
+                match = True
+                seedSet.add(x.GetId())        # Add x to the seed set
+            
+                for y in x.GetOutEdges():
                     if threshold[y] > 0:
                         threshold[y] = threshold[y] - 1
                     removeSet.add(y)
 
                 for edge in removeSet:
-                    graph.DelEdge(x.GetId(), edge)  # Si rimuovono gli archi con i vicini.
+                    graph.DelEdge(x.GetId(), edge)
 
                 graph.DelNode(x.GetId())
                 removeSet.clear()
-
-
-        if not match:      # Se non è stato trovato un nodo da rimuovere per il threshold
+        #if it wasn't find any node to remove, case3
+        if not match:     
             argMax = -1
             id = -1
-            for x in graph.Nodes():     # Selezione del nodo che massimizza la quantità specificata
+            #select the node that maximize the specified quantity
+            for x in graph.Nodes():
                 nodeDeg = threshold[x.GetId()]/(x.GetOutDeg() * (x.GetOutDeg() + 1))
                 if nodeDeg > argMax:
                     argMax = nodeDeg
                     id = x.GetId()
 
-            # Eliminare il nodo che massimizza la quantità
+            #delete the node previosly selected
             node = graph.GetNI(id)
-            for y in node.GetOutEdges():  # Rimozione del nodo dal grafo
+            for y in node.GetOutEdges():
                 removeSet.add(y)
-
+            #remove the adiacent edges of the selected node
             for edge in removeSet:
-                graph.DelEdge(id, edge)  # Si rimuovono gli archi con i vicini.
+                graph.DelEdge(id, edge)  
 
             graph.DelNode(id)
             removeSet.clear()
-            print("Caso 3: eliminato nodo " + str(id))
-
-    return s
-
-
-
-'''
-g1 = snap.TUNGraph.New()
-g1.AddNode(0)
-g1.AddNode(1)
-g1.AddNode(2)
-g1.AddNode(3)
-g1.AddEdge(0, 1)
-g1.AddEdge(1, 2)
-g1.AddEdge(2, 3)
-threshold = snap.TIntH()
-for x in g1.Nodes():
-    threshold[x.GetId()] = 2
-    print("threshold di " + str(x.GetId()) + " pari a " + str(threshold[x.GetId()]))
-s = tss(snap.ConvertGraph(type(g1), g1), threshold)
-for id in s:
-    print("Nodo: " + str(id))
-'''
+            #print("Case 3: eliminated the node with id: " + str(id))
+    return seedSet
