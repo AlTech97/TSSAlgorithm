@@ -1,6 +1,5 @@
 import snap
 
-
 # noinspection PyUnresolvedReferences
 def tssAlgorithm(graph: snap.TUNGraph, threshold):
     match = False
@@ -46,7 +45,7 @@ def tssAlgorithm(graph: snap.TUNGraph, threshold):
 
                 graph.DelNode(x.GetId())
                 removeSet.clear()
-        #if it wasn't find any node to remove, case3
+        #case3: if it wasn't find any node to remove
         if not match:     
             argMax = -1
             id = -1
