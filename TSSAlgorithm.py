@@ -2,69 +2,66 @@ import snap
 
 # noinspection PyUnresolvedReferences
 def tssAlgorithm(graph: snap.TUNGraph, threshold):
-    match = False
     seedSet = set()
     removeSet = set()
-
+    
     #While the graph is not empty
     while graph.GetNodes() != 0:   
         match = False
         
         #Read all the vertex
-        for x in graph.Nodes():
+        for node in graph.Nodes():
             #case1     
-            if threshold[x.GetId()] == 0:
+            if threshold[node.GetId()] == 0:
                 match = True                
-                #print("Case 1: threshold["+str(x.GetId())+"] = 0")
-                for y in x.GetOutEdges():
-                    if threshold[y] > 0:
+                for neighbor in node.GetOutEdges():
+                    if threshold[neighbor] > 0:
                         # reduce the threshold of the neighbor
-                        threshold[y] = threshold[y] - 1         
-                    removeSet.add(y);
+                        threshold[neighbor] = threshold[neighbor] - 1         
+                    removeSet.add(neighbor);
 
                 #remove the edges to the neighbors
                 for edge in removeSet:
-                    graph.DelEdge(x.GetId(), edge)
+                    graph.DelEdge(node.GetId(), edge)
                 
                 #remove the node and clear the removeSet
-                graph.DelNode(x.GetId())     
+                graph.DelNode(node.GetId())     
                 removeSet.clear()
             #case2
-            elif x.GetOutDeg() < threshold[x.GetId()]:
-                #print("Case 2: the grade of the node: "+str(x.GetId())+" is: "+str(x.GetOutDeg())+", lower than the threshold[" + str(x.GetId()) + "] = " + str(threshold[x.GetId()]))
+            elif node.GetOutDeg() < threshold[node.GetId()]:
                 match = True
-                seedSet.add(x.GetId())        # Add x to the seed set
+                seedSet.add(node.GetId())        # Add node to the seed set
             
-                for y in x.GetOutEdges():
-                    if threshold[y] > 0:
-                        threshold[y] = threshold[y] - 1
-                    removeSet.add(y)
+                for neighbor in node.GetOutEdges():
+                    if threshold[neighbor] > 0:
+                        threshold[neighbor] = threshold[neighbor] - 1
+                    removeSet.add(neighbor)
 
                 for edge in removeSet:
-                    graph.DelEdge(x.GetId(), edge)
+                    graph.DelEdge(node.GetId(), edge)
 
-                graph.DelNode(x.GetId())
+                graph.DelNode(node.GetId())
                 removeSet.clear()
         #case3: if it wasn't find any node to remove
         if not match:     
             argMax = -1
             id = -1
             #select the node that maximize the specified quantity
-            for x in graph.Nodes():
-                nodeDeg = threshold[x.GetId()]/(x.GetOutDeg() * (x.GetOutDeg() + 1))
+            for node in graph.Nodes():
+                nodeDeg = threshold[node.GetId()]/(node.GetOutDeg() * (node.GetOutDeg() + 1))
                 if nodeDeg > argMax:
                     argMax = nodeDeg
-                    id = x.GetId()
+                    id = node.GetId()
 
             #delete the node previosly selected
             node = graph.GetNI(id)
-            for y in node.GetOutEdges():
-                removeSet.add(y)
+            for neighbor in node.GetOutEdges():
+                removeSet.add(neighbor)
             #remove the adiacent edges of the selected node
             for edge in removeSet:
                 graph.DelEdge(id, edge)  
 
             graph.DelNode(id)
             removeSet.clear()
-            #print("Case 3: eliminated the node with id: " + str(id))
+
     return seedSet
