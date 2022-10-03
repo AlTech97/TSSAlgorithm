@@ -2,7 +2,7 @@ import snap
 
 # noinspection PyUnresolvedReferences
 def tssAlgorithm(graph: snap.TUNGraph, threshold):
-    seedSet = set()
+    targetSet = set()
     removeSet = set()
     
     #While the graph is not empty
@@ -30,7 +30,7 @@ def tssAlgorithm(graph: snap.TUNGraph, threshold):
             #case2
             elif node.GetOutDeg() < threshold[node.GetId()]:
                 match = True
-                seedSet.add(node.GetId())        # Add node to the seed set
+                targetSet.add(node.GetId())      
             
                 for neighbor in node.GetOutEdges():
                     if threshold[neighbor] > 0:
@@ -64,4 +64,4 @@ def tssAlgorithm(graph: snap.TUNGraph, threshold):
             graph.DelNode(id)
             removeSet.clear()
 
-    return seedSet
+    return targetSet

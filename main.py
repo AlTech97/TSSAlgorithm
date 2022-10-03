@@ -22,5 +22,7 @@ if __name__ == "__main__":
             nt.runProportionalThreshold(graph)
         elif menu == "3":
             nt.runProbabilityStaticThreshold(graph)
+        elif menu == "4":
+            nt.runProbabilityProportionalThreshold(graph)
         else:
             print("Please choose correct answer\n")

@@ -16,9 +16,9 @@ def runStaticThreshold(graph: snap.TUNGraph):
         for node in graph.Nodes():
             hashTable[node.GetId()] = threshold
 
-        seedSet = tss.tssAlgorithm(snap.ConvertGraph(type(graph), graph), hashTable)
+        targetSet = tss.tssAlgorithm(snap.ConvertGraph(type(graph), graph), hashTable)
 
-        print("Threshold: " + str(threshold) + "; seed set size: " + str(len(seedSet)))
+        print("Threshold: " + str(threshold) + "; Target Set size: " + str(len(targetSet)))
 
 #run the tss algorithm with a threshold proportional with the degree of each node
 def runProportionalThreshold(graph: snap.TUNGraph):
@@ -29,8 +29,9 @@ def runProportionalThreshold(graph: snap.TUNGraph):
         for node in graph.Nodes():
             hashTable[node.GetId()] = math.ceil(proportion * node.GetOutDeg())
 
-        seedSet = tss.tssAlgorithm(snap.ConvertGraph(type(graph), graph), hashTable)
-        print("Proportion: " + str(proportion) + "; seed set size: " + str(len(seedSet)))
+        targetSet = tss.tssAlgorithm(snap.ConvertGraph(type(graph), graph), hashTable)
+
+        print("Proportion: " + str(proportion) + "; Target Set size: " + str(len(targetSet)))
 
 def deferredDecision(graph, probabilityHashTable):
     for edge in graph.Edges():
@@ -63,11 +64,12 @@ def runProbabilityStaticThreshold(graph: snap.TUNGraph):
         sum = 0
         for i in range(MIN_RANGE, MAX_RANGE):
             tempGraph = deferredDecision(snap.ConvertGraph(type(graph), graph), edgesProbability)
-            seedSet= tss.tssAlgorithm(tempGraph, hashTable)
-            size = len(seedSet)
+            targetSet= tss.tssAlgorithm(tempGraph, hashTable)
+            size = len(targetSet)
             sum = sum + size
         mean = sum / (MAX_RANGE-1)
-        print("threshold: " + str(threshold) + "; mean seed set size: " + str(mean))
+
+        print("Threshold: " + str(threshold) + "; Mean Target Set size: " + str(mean))
 
 #Run a proportional-threshold tss with a random edgesProbability of the edge
 def runProbabilityProportionalThreshold(graph: snap.TUNGraph):
@@ -89,11 +91,12 @@ def runProbabilityProportionalThreshold(graph: snap.TUNGraph):
             
         mean = 0
         sum = 0
-        for j in range(MIN_RANGE, MAX_RANGE):
+        for j in range(MIN_RANGE, 3):
             threshold = copy.deepcopy(hashTable)
             tempGraph = deferredDecision(snap.ConvertGraph(type(graph), graph), edgesProbability)
-            seedSet = tss.tssAlgorithm(tempGraph, threshold)
-            size = len(seedSet)
+            targetSet = tss.tssAlgorithm(tempGraph, threshold)
+            size = len(targetSet)
             sum = sum + size
         mean = sum / (MAX_RANGE - 1)
-        print("proportion: " + str(proportion) + "; mean seed set size: " + str(mean))
+        
+        print("Proportion: " + str(proportion) + "; Mean Target Set size: " + str(mean))
