@@ -1,14 +1,21 @@
 from email.mime import base
+from fileinput import filename
 import networkTest as nt
 import snap
 
 basePath = "Dataset/facebook_clean_data/"
+extension = ".csv"
 
 if __name__ == "__main__":
-    menu = input("TSS test: write one of the following number for make an operation:\n1) run with a static threshold\n2) run with a proportional threshold\n3) run with a probability static threshold\n-1)exit")
-    while menu != -1:
-        fileName = "politician_edges.csv"
-        graph = snap.LoadEdgeList(snap.TUNGraph, basePath + fileName, 0, 1, ',')
+    fileName = input("Write the name of the dataset\n")
+    graph = snap.LoadEdgeList(snap.TUNGraph, basePath + fileName + extension, 0, 1, ',')
+
+    while True:
+        menu = input("\nTSS test: write one of the following number for make an operation:\n0) Exit\n1) run with a static threshold\
+        \n2) run with a proportional threshold\n3) run with a different probability and static threshold\n4) run with a different probability and proportional threshold\n")
+        if menu == "0":
+            print("Bye!\n")
+            break
         if menu == "1":
             nt.runStaticThreshold(graph)
         elif menu == "2":
@@ -16,5 +23,4 @@ if __name__ == "__main__":
         elif menu == "3":
             nt.runProbabilityStaticThreshold(graph)
         else:
-            print("Please choose correct answer")
-        menu = input("TSS test: write one of the following number for make an operation:\n1) run with a static threshold\n2) run with a proportional threshold\n3) run with a probability static threshold\n-1)exit")
+            print("Please choose correct answer\n")
